@@ -1,0 +1,318 @@
+---
+title: "ora"
+output:
+    html_document:
+        toc: true
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, message=FALSE}
+library(EnrichmentBrowser)
+library(dplyr)
+library(purrr)
+```
+
+## Create example data
+
+Create example data using the functions in the EnrichmentBrowser package:
+
+```{r}
+seed <- 123
+sig_gen_fdr <- 0.1 #FDR threshold for significant genes in the DA
+
+## Create SummarizedExperiment
+set.seed(seed)
+se <- makeExampleData(what="SE")
+
+## Run Differential abundance
+set.seed(seed)
+se <- deAna(se)
+
+# Create a list of ten signatures
+set.seed(seed)
+gs <- makeExampleData(what="gs", gnames=names(se))
+
+n_unique_g <- length(unique(unlist(gs, use.names = FALSE)))
+```
+
+The SummarizedExperiment (SE) contains `r nrow(se)` unique genes in total:
+
+```{r}
+se
+```
+
+There are `r n_unique_g` unique genes across all signatures.
+
+```{r}
+n_unique_g
+```
+
+Individual lengths of the signatures:
+
+```{r}
+map_int(gs, length)
+```
+
+Define significant genes (adjusted pvalue < 0.1):
+
+```{r}
+sig.genes <- names(se)[rowData(se)$ADJ.PVAL < sig_gen_fdr]
+length(sig.genes)
+```
+Two of the signatures (gs1 and gs2) will be composed of significantly DA genes
+entirely:
+
+```{r}
+gs[[1]] <- sample(sig.genes, length(gs[[1]])) 
+gs[[2]] <- sample(sig.genes, length(gs[[2]]))   
+
+map_dbl(gs, ~ round(mean(.x %in% sig.genes), 2))
+```
+
+## Run ORA
+
+In this analysis, we are using all of the original 10 signatures:
+
+```{r}
+ea.res <- sbea(
+    method = "ora", se = se, gs = gs, perm = 0,
+    alpha = sig_gen_fdr, # FDR threshold for significant genes in the DA
+    padj.method = "fdr"
+)
+res <- ea.res$res.tbl |> 
+    as.data.frame() |> 
+    arrange(PVAL)
+res |> 
+    knitr::kable()
+```
+
+## Reproduce "manually" what sbea does
+
+To inspect the results more in detail, let's reproduce the code
+implemented in EnrichmentBrowser, but adding information about the number
+of genes in the background as well.
+
+EnrichmentBrowser uses the `phyper` function for ORA.
+
+The following snippets of code were taken from the EnrichmentBrowser
+package (in Bioconductor):
+
+```{r, warning=FALSE}
+myORA <- function(se, gs, sig.genes) {
+    ## Get a subset of signatures and genes in the SE for further analysis
+    GS.MIN.SIZE <- 5
+    GS.MAX.SIZE <- 500
+
+    ## Subset of the original SE.
+    ## This depends on the genes available in the signatures database 
+    igenes <- intersect(rownames(se), unique(unlist(gs)))
+    newSE <- se[igenes,]
+
+    ## Subset of the genes in the signatures
+    newGS <- lapply(gs, function(s) s[s %in% igenes])
+    lens <- lengths(newGS)
+    newGS <- newGS[lens >= GS.MIN.SIZE & lens <= GS.MAX.SIZE]
+    f <- file()
+    sink(file = f)
+    cmat <- safe::getCmatrix(newGS, as.matrix = TRUE)
+    sink()
+    close(f)
+    newSE <- newSE[rownames(cmat),] 
+
+    ## Subset of the original number of significant genes
+    isig <- rownames(newSE) %in% sig.genes
+    nr.sigs <- sum(isig)
+
+    ## Run ORA with phyper
+    sig.cmat <- cmat & isig
+    ovlp.sizes <- colSums(sig.cmat)
+    gs.sizes <- colSums(cmat) 
+    uni.sizes <- nrow(newSE) - gs.sizes 
+    gs.ps <- phyper(
+        q = ovlp.sizes - 1, # number of significant genes in the signature (minus 1)
+        m = gs.sizes, # number of genes in the signature (significant or not)
+        n = uni.sizes, # number of genes not in the signature (significant or not)
+        k = nr.sigs, # total number of significant genes (in the signature or not)
+        lower.tail = FALSE
+    ) 
+    
+    res_tbl <- tibble(
+        gene_set_name = colnames(cmat),
+        genes_in_set = gs.sizes,
+        sig_genes_in_set = ovlp.sizes,
+        p_value = gs.ps,
+        genes_not_in_set = uni.sizes,
+        total_sig_genes = nr.sigs
+    ) |> 
+        arrange(p_value)
+    
+    list(
+        rest_tbl = res_tbl,
+        newSE = newSE,
+        newGS = newGS,
+        nr.sigs = nr.sigs
+    )
+}
+my_ora <- myORA(se, gs, sig.genes)
+my_ora$rest_tbl |> 
+    knitr::kable()
+```
+
+Note that after the analysis, the total number of genes in the SE is reduced.
+This reduction depends on the intersection between the total unique
+genes across the whole list/collection/database of signatures and the genes
+present in the SE.
+
+Updated number of genes (reduced):
+
+```{r}
+my_ora$newSE
+```
+Updated number of significant genes (reduced):
+
+```{r}
+my_ora$nr.sigs
+```
+
+## Check one signature with different accompanying sets of signatures
+
+So, if the number of unique genes in the collection/database of signatures
+changes, the background will change as well even when the SE 
+and an a target signature are the same:
+
+```{r}
+output <- vector("list", length(gs))
+for (i in seq_along(output)) {
+    ora <- sbea(
+        method="ora", se=se, gs=gs[1:i], perm=0, alpha = 0.1, padj.method = "fdr"
+    )
+    output[[i]] <- as.data.frame(ora$res.tbl)
+    names(output) <- paste0("nsigs_", length(1:i))
+}
+output <- bind_rows(output, .id = "n_gs")
+output |> 
+    filter(GENE.SET == "gs1") |> 
+    knitr::kable()
+```
+
+
+In the example above, the input SE and the signature of interest (gs1) were the
+same, but the p-value changed depending on the number of unique genes present
+across all signatures.
+
+Total number of genes left in the SE:
+
+```{r}
+output2 <- vector("list", length(gs))
+for (i in seq_along(output2)) {
+    output2[[i]] <- myORA(se, gs[1:i], sig.genes)
+    names(output2)[i] <- paste0("nsigs_", length(1:i))
+}
+map_int(output2, ~ nrow(.x$newSE))
+```
+
+Let's use our custom function created above to reproduce the results using
+the EnrichemntBrowser functions, but now adding the number of genes in the
+background:
+
+```{r, message=FALSE}
+res_tbl2 <- output2 |> 
+    map(~ return(.x[["rest_tbl"]])) |> 
+    bind_rows(.id = "n_gs")
+res_tbl2 |>
+    filter(gene_set_name == "gs1") |>
+    knitr::kable()
+```
+
+Let's add a signature for background:
+
+```{r}
+background_sig <- list(bk = unique(unlist(gs)))
+length(background_sig[[1]])
+```
+Running the ORA:
+
+```{r}
+output3 <- vector("list", length(gs))
+for (i in seq_along(output3)) {
+    input_gs <- c(gs[1:i], background_sig)
+    ora_3 <- sbea(
+        method = "ora", se = se, gs = input_gs, perm = 0, alpha = 0.1,
+        padj.method = "fdr"
+    )
+    output3[[i]] <- as.data.frame(ora_3$res.tbl)
+    names(output3) <- paste0("nsigs_", length(1:i))
+}
+output3 <- bind_rows(output3, .id = "n_gs")
+output3 |> 
+    filter(GENE.SET == "gs1") |> 
+    knitr::kable()
+```
+
+
+Above, the pvalue was the same in all cases. FDR will still vary depending
+on the number and values of the p-values being adjusted.
+
+## Reproduce with Fisher exact test
+
+Now, let's just create a custom function to achieve the same results, but
+using the `fisher.test` function instead of the `phyper` function:
+
+```{r}
+myFisher <- function(x) {
+    mySE <- x$newSE
+    mySigs <- x$newGS
+    all_genes <- rownames(mySE)
+    results <- vector("list", length(mySigs)) 
+    for (i in seq_along(results)) {
+        a <- sum(mySigs[[i]] %in% sig.genes)
+        b <- sum(!mySigs[[i]] %in% sig.genes)
+        c <- sum((all_genes %in% sig.genes) & (!all_genes %in% mySigs[[i]]))
+        d <- sum((!all_genes %in% sig.genes) & (!all_genes %in% mySigs[[i]]))
+        ct <- matrix(c(a, b, c, d), nrow = 2, byrow = TRUE)
+        pval <- fisher.test(ct, alternative = "g")$p.value
+        sig_name <- names(mySigs)[i]
+        
+        dat <- as.data.frame(matrix(c(sig_name,pval, a, b, c, d), nrow = 1))
+        colnames(dat) <- c(
+            "sig_name", "p_value",
+            "significat_inSignature", "notSignificant_inSignature", 
+            "significant_inBackground", "notSignificant_inBackground"
+        )
+        results[[i]] <- dat
+    }
+    results |> 
+        bind_rows() |> 
+        arrange(p_value)
+}
+```
+
+Reproducing the first analysis:
+
+```{r}
+myFisher(output2[[10]]) |> 
+    knitr::kable()
+```
+
+Reproducing the analysis above with different number of
+signatures:
+
+```{r}
+output2 |> 
+    map(myFisher) |> 
+    bind_rows(.id = "n_sigs") |> 
+    filter(sig_name == "gs1") |> 
+    knitr::kable()
+```
+
+## Session information
+
+```{r}
+sessioninfo::session_info()
+```
