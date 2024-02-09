@@ -230,12 +230,17 @@ res_tbl2 |>
     knitr::kable()
 ```
 
+
+In order to keep the same p-value regardless of how many signatures
+are analyzed, we sould need to add a background as an additional signature.
+
 Let's add a signature for background:
 
 ```{r}
 background_sig <- list(bk = unique(unlist(gs)))
 length(background_sig[[1]])
 ```
+
 Running the ORA:
 
 ```{r}
@@ -254,7 +259,6 @@ output3 |>
     filter(GENE.SET == "gs1") |> 
     knitr::kable()
 ```
-
 
 Above, the pvalue was the same in all cases. FDR will still vary depending
 on the number and values of the p-values being adjusted.
