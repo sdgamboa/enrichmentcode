@@ -16,3 +16,4 @@ Imports:
     EnrichmentBrowser,
     purrr
 URL: https://sdgamboa.github.io/enrichmentcode/
+BugReports: https://sdgamboa.github.io/enrichmentcode/issues/
