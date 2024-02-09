@@ -28,7 +28,7 @@ sig_gen_fdr <- 0.1 #FDR threshold for significant genes in the DA
 
 ## Create SummarizedExperiment
 set.seed(seed)
-se <- makeExampleData(what="SE")
+se <- makeExampleData(what = "SE")
 
 ## Run Differential abundance
 set.seed(seed)
@@ -36,21 +36,13 @@ se <- deAna(se)
 
 # Create a list of ten signatures
 set.seed(seed)
-gs <- makeExampleData(what="gs", gnames=names(se))
-
-n_unique_g <- length(unique(unlist(gs, use.names = FALSE)))
+gs <- makeExampleData(what = "gs", gnames = names(se))
 ```
 
 The SummarizedExperiment (SE) contains `r nrow(se)` unique genes in total:
 
 ```{r}
 se
-```
-
-There are `r n_unique_g` unique genes across all signatures.
-
-```{r}
-n_unique_g
 ```
 
 Individual lengths of the signatures:
@@ -69,10 +61,18 @@ Two of the signatures (gs1 and gs2) will be composed of significantly DA genes
 entirely:
 
 ```{r}
+set.seed(seed)
 gs[[1]] <- sample(sig.genes, length(gs[[1]])) 
+set.seed(seed)
 gs[[2]] <- sample(sig.genes, length(gs[[2]]))   
-
+n_unique_g <- length(unique(unlist(gs, use.names = FALSE)))
 map_dbl(gs, ~ round(mean(.x %in% sig.genes), 2))
+```
+
+There are `r n_unique_g` unique genes across all signatures.
+
+```{r}
+n_unique_g
 ```
 
 ## Run ORA
