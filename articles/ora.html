@@ -101,7 +101,7 @@ package:</p>
 <span></span>
 <span><span class="co">## Create SummarizedExperiment</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
-<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/EnrichmentBrowser/man/makeExampleData.html" class="external-link">makeExampleData</a></span><span class="op">(</span>what<span class="op">=</span><span class="st">"SE"</span><span class="op">)</span></span>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/EnrichmentBrowser/man/makeExampleData.html" class="external-link">makeExampleData</a></span><span class="op">(</span>what <span class="op">=</span> <span class="st">"SE"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Run Differential abundance</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
@@ -109,9 +109,7 @@ package:</p>
 <span></span>
 <span><span class="co"># Create a list of ten signatures</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
-<span><span class="va">gs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/EnrichmentBrowser/man/makeExampleData.html" class="external-link">makeExampleData</a></span><span class="op">(</span>what<span class="op">=</span><span class="st">"gs"</span>, gnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">n_unique_g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">gs</span>, use.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">gs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/EnrichmentBrowser/man/makeExampleData.html" class="external-link">makeExampleData</a></span><span class="op">(</span>what <span class="op">=</span> <span class="st">"gs"</span>, gnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The SummarizedExperiment (SE) contains 100 unique genes in total:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">se</span></span>
@@ -123,29 +121,31 @@ package:</p>
 <span><span class="co">#&gt; rowData names(4): FC limma.STAT PVAL ADJ.PVAL</span></span>
 <span><span class="co">#&gt; colnames(12): s1 s2 ... s11 s12</span></span>
 <span><span class="co">#&gt; colData names(2): GROUP BLOCK</span></span></code></pre></div>
-<p>There are 91 unique genes across all signatures.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_unique_g</span></span>
-<span><span class="co">#&gt; [1] 91</span></span></code></pre></div>
 <p>Individual lengths of the signatures:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">gs</span>, <span class="va">length</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  gs1  gs2  gs3  gs4  gs5  gs6  gs7  gs8  gs9 gs10 </span></span>
 <span><span class="co">#&gt;   17   17   25   18   17   17   19   18   19   21</span></span></code></pre></div>
 <p>Define significant genes (adjusted pvalue &lt; 0.1):</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sig.genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">$</span><span class="va">ADJ.PVAL</span> <span class="op">&lt;</span> <span class="va">sig_gen_fdr</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sig.genes</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 72</span></span></code></pre></div>
 <p>Two of the signatures (gs1 and gs2) will be composed of significantly
 DA genes entirely:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">sig.genes</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">gs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> </span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
+<span><span class="va">gs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">sig.genes</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">gs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span></span>
 <span><span class="va">gs</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">sig.genes</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">gs</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>   </span>
-<span></span>
+<span><span class="va">n_unique_g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">gs</span>, use.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_dbl</a></span><span class="op">(</span><span class="va">gs</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.x</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">sig.genes</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  gs1  gs2  gs3  gs4  gs5  gs6  gs7  gs8  gs9 gs10 </span></span>
 <span><span class="co">#&gt; 1.00 1.00 0.76 0.44 0.65 0.94 0.68 0.72 0.74 0.57</span></span></code></pre></div>
+<p>There are 88 unique genes across all signatures.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">n_unique_g</span></span>
+<span><span class="co">#&gt; [1] 88</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="run-ora">Run ORA<a class="anchor" aria-label="anchor" href="#run-ora"></a>
@@ -175,71 +175,71 @@ DA genes entirely:</p>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.00975</td>
+<td align="right">0.00121</td>
+<td align="right">0.0060500</td>
 </tr>
 <tr class="even">
 <td align="left">gs2</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.00975</td>
+<td align="right">0.00121</td>
+<td align="right">0.0060500</td>
 </tr>
 <tr class="odd">
 <td align="left">gs6</td>
 <td align="right">17</td>
 <td align="right">16</td>
-<td align="right">0.01890</td>
-<td align="right">0.06300</td>
+<td align="right">0.01280</td>
+<td align="right">0.0426667</td>
 </tr>
 <tr class="even">
 <td align="left">gs3</td>
 <td align="right">25</td>
 <td align="right">19</td>
-<td align="right">0.40600</td>
-<td align="right">0.99900</td>
+<td align="right">0.32800</td>
+<td align="right">0.8200000</td>
 </tr>
 <tr class="odd">
 <td align="left">gs9</td>
 <td align="right">19</td>
 <td align="right">14</td>
-<td align="right">0.55300</td>
-<td align="right">0.99900</td>
+<td align="right">0.48300</td>
+<td align="right">0.9183333</td>
 </tr>
 <tr class="even">
 <td align="left">gs8</td>
 <td align="right">18</td>
 <td align="right">13</td>
-<td align="right">0.61700</td>
-<td align="right">0.99900</td>
+<td align="right">0.55100</td>
+<td align="right">0.9183333</td>
 </tr>
 <tr class="odd">
 <td align="left">gs7</td>
 <td align="right">19</td>
 <td align="right">13</td>
-<td align="right">0.75600</td>
-<td align="right">0.99900</td>
+<td align="right">0.69800</td>
+<td align="right">0.9971429</td>
 </tr>
 <tr class="even">
 <td align="left">gs5</td>
 <td align="right">17</td>
 <td align="right">11</td>
-<td align="right">0.85200</td>
-<td align="right">0.99900</td>
+<td align="right">0.81100</td>
+<td align="right">0.9980000</td>
 </tr>
 <tr class="odd">
 <td align="left">gs10</td>
 <td align="right">21</td>
 <td align="right">12</td>
-<td align="right">0.97500</td>
-<td align="right">0.99900</td>
+<td align="right">0.96200</td>
+<td align="right">0.9980000</td>
 </tr>
 <tr class="even">
 <td align="left">gs4</td>
 <td align="right">18</td>
 <td align="right">8</td>
-<td align="right">0.99900</td>
-<td align="right">0.99900</td>
+<td align="right">0.99800</td>
+<td align="right">0.9980000</td>
 </tr>
 </tbody>
 </table>
@@ -334,81 +334,81 @@ package (in Bioconductor):</p>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0019546</td>
-<td align="right">76</td>
-<td align="right">67</td>
+<td align="right">0.0012063</td>
+<td align="right">71</td>
+<td align="right">62</td>
 </tr>
 <tr class="even">
 <td align="left">gs2</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0019546</td>
-<td align="right">76</td>
-<td align="right">67</td>
+<td align="right">0.0012063</td>
+<td align="right">71</td>
+<td align="right">62</td>
 </tr>
 <tr class="odd">
 <td align="left">gs6</td>
 <td align="right">17</td>
 <td align="right">16</td>
-<td align="right">0.0188942</td>
-<td align="right">76</td>
-<td align="right">67</td>
+<td align="right">0.0127970</td>
+<td align="right">71</td>
+<td align="right">62</td>
 </tr>
 <tr class="even">
 <td align="left">gs3</td>
 <td align="right">25</td>
 <td align="right">19</td>
-<td align="right">0.4062891</td>
-<td align="right">68</td>
-<td align="right">67</td>
+<td align="right">0.3279523</td>
+<td align="right">63</td>
+<td align="right">62</td>
 </tr>
 <tr class="odd">
 <td align="left">gs9</td>
 <td align="right">19</td>
 <td align="right">14</td>
-<td align="right">0.5528098</td>
-<td align="right">74</td>
-<td align="right">67</td>
+<td align="right">0.4834058</td>
+<td align="right">69</td>
+<td align="right">62</td>
 </tr>
 <tr class="even">
 <td align="left">gs8</td>
 <td align="right">18</td>
 <td align="right">13</td>
-<td align="right">0.6169761</td>
-<td align="right">75</td>
-<td align="right">67</td>
+<td align="right">0.5511964</td>
+<td align="right">70</td>
+<td align="right">62</td>
 </tr>
 <tr class="odd">
 <td align="left">gs7</td>
 <td align="right">19</td>
 <td align="right">13</td>
-<td align="right">0.7560032</td>
-<td align="right">74</td>
-<td align="right">67</td>
+<td align="right">0.6980759</td>
+<td align="right">69</td>
+<td align="right">62</td>
 </tr>
 <tr class="even">
 <td align="left">gs5</td>
 <td align="right">17</td>
 <td align="right">11</td>
-<td align="right">0.8516972</td>
-<td align="right">76</td>
-<td align="right">67</td>
+<td align="right">0.8105875</td>
+<td align="right">71</td>
+<td align="right">62</td>
 </tr>
 <tr class="odd">
 <td align="left">gs10</td>
 <td align="right">21</td>
 <td align="right">12</td>
-<td align="right">0.9750319</td>
-<td align="right">72</td>
+<td align="right">0.9621584</td>
 <td align="right">67</td>
+<td align="right">62</td>
 </tr>
 <tr class="even">
 <td align="left">gs4</td>
 <td align="right">18</td>
 <td align="right">8</td>
-<td align="right">0.9989302</td>
-<td align="right">75</td>
-<td align="right">67</td>
+<td align="right">0.9981533</td>
+<td align="right">70</td>
+<td align="right">62</td>
 </tr>
 </tbody>
 </table>
@@ -420,17 +420,17 @@ the genes present in the SE.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_ora</span><span class="op">$</span><span class="va">newSE</span></span>
 <span><span class="co">#&gt; class: SummarizedExperiment </span></span>
-<span><span class="co">#&gt; dim: 93 12 </span></span>
+<span><span class="co">#&gt; dim: 88 12 </span></span>
 <span><span class="co">#&gt; metadata(0):</span></span>
 <span><span class="co">#&gt; assays(1): exprs</span></span>
-<span><span class="co">#&gt; rownames(93): g1 g10 ... g98 g99</span></span>
+<span><span class="co">#&gt; rownames(88): g1 g10 ... g98 g99</span></span>
 <span><span class="co">#&gt; rowData names(4): FC limma.STAT PVAL ADJ.PVAL</span></span>
 <span><span class="co">#&gt; colnames(12): s1 s2 ... s11 s12</span></span>
 <span><span class="co">#&gt; colData names(2): GROUP BLOCK</span></span></code></pre></div>
 <p>Updated number of significant genes (reduced):</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_ora</span><span class="op">$</span><span class="va">nr.sigs</span></span>
-<span><span class="co">#&gt; [1] 67</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 62</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="check-one-signature-with-different-accompanying-sets-of-signatures">Check one signature with different accompanying sets of
@@ -467,80 +467,80 @@ and an a target signature are the same:</p>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">1.00000</td>
 <td align="right">1.000000</td>
+<td align="right">1.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">1.00000</td>
 <td align="right">1.000000</td>
+<td align="right">1.0000000</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.06000</td>
-<td align="right">0.090000</td>
+<td align="right">0.016700</td>
+<td align="right">0.0250500</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00886</td>
-<td align="right">0.017720</td>
+<td align="right">0.001330</td>
+<td align="right">0.0026600</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00368</td>
-<td align="right">0.009200</td>
+<td align="right">0.000767</td>
+<td align="right">0.0019175</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00503</td>
-<td align="right">0.015090</td>
+<td align="right">0.001730</td>
+<td align="right">0.0051900</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00484</td>
-<td align="right">0.016940</td>
+<td align="right">0.002670</td>
+<td align="right">0.0093450</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00497</td>
-<td align="right">0.019880</td>
+<td align="right">0.003150</td>
+<td align="right">0.0126000</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00347</td>
-<td align="right">0.015615</td>
+<td align="right">0.002390</td>
+<td align="right">0.0107550</td>
 </tr>
 <tr class="even">
 <td align="left">10</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.009750</td>
+<td align="right">0.001210</td>
+<td align="right">0.0060500</td>
 </tr>
 </tbody>
 </table>
@@ -556,9 +556,9 @@ unique genes present across all signatures.</p>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_int</a></span><span class="op">(</span><span class="va">output2</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">newSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  nsigs_1  nsigs_2  nsigs_3  nsigs_4  nsigs_5  nsigs_6  nsigs_7  nsigs_8 </span></span>
-<span><span class="co">#&gt;       17       28       48       58       69       72       79       83 </span></span>
+<span><span class="co">#&gt;       17       17       37       46       58       63       73       78 </span></span>
 <span><span class="co">#&gt;  nsigs_9 nsigs_10 </span></span>
-<span><span class="co">#&gt;       86       93</span></span></code></pre></div>
+<span><span class="co">#&gt;       82       88</span></span></code></pre></div>
 <p>Let’s use our custom function created above to reproduce the results
 using the EnrichemntBrowser functions, but now adding the number of
 genes in the background:</p>
@@ -604,80 +604,80 @@ genes in the background:</p>
 <td align="right">17</td>
 <td align="right">17</td>
 <td align="right">1.0000000</td>
-<td align="right">11</td>
-<td align="right">28</td>
+<td align="right">0</td>
+<td align="right">17</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_3</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0599992</td>
+<td align="right">0.0166725</td>
+<td align="right">20</td>
 <td align="right">31</td>
-<td align="right">42</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_4</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0088570</td>
-<td align="right">41</td>
-<td align="right">46</td>
+<td align="right">0.0013337</td>
+<td align="right">29</td>
+<td align="right">34</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_5</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0036792</td>
-<td align="right">52</td>
-<td align="right">52</td>
+<td align="right">0.0007673</td>
+<td align="right">41</td>
+<td align="right">41</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_6</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0050332</td>
-<td align="right">55</td>
-<td align="right">55</td>
+<td align="right">0.0017273</td>
+<td align="right">46</td>
+<td align="right">46</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_7</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0048449</td>
-<td align="right">62</td>
-<td align="right">60</td>
+<td align="right">0.0026677</td>
+<td align="right">56</td>
+<td align="right">54</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_8</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0049709</td>
-<td align="right">66</td>
-<td align="right">63</td>
+<td align="right">0.0031495</td>
+<td align="right">61</td>
+<td align="right">58</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_9</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0034654</td>
-<td align="right">69</td>
-<td align="right">64</td>
+<td align="right">0.0023896</td>
+<td align="right">65</td>
+<td align="right">60</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_10</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.0019546</td>
-<td align="right">76</td>
-<td align="right">67</td>
+<td align="right">0.0012063</td>
+<td align="right">71</td>
+<td align="right">62</td>
 </tr>
 </tbody>
 </table>
@@ -688,7 +688,7 @@ signature.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">background_sig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bk <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">gs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">background_sig</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 93</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 88</span></span></code></pre></div>
 <p>Running the ORA:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">vector</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">gs</span><span class="op">)</span><span class="op">)</span></span>
@@ -720,80 +720,80 @@ signature.</p>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.003900</td>
+<td align="right">0.00121</td>
+<td align="right">0.002420</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.002925</td>
+<td align="right">0.00121</td>
+<td align="right">0.001815</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.003900</td>
+<td align="right">0.00121</td>
+<td align="right">0.002420</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.004875</td>
+<td align="right">0.00121</td>
+<td align="right">0.003025</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.005850</td>
+<td align="right">0.00121</td>
+<td align="right">0.003630</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.006825</td>
+<td align="right">0.00121</td>
+<td align="right">0.004235</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.007800</td>
+<td align="right">0.00121</td>
+<td align="right">0.004840</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.008775</td>
+<td align="right">0.00121</td>
+<td align="right">0.005445</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.009750</td>
+<td align="right">0.00121</td>
+<td align="right">0.006050</td>
 </tr>
 <tr class="even">
 <td align="left">10</td>
 <td align="left">gs1</td>
 <td align="right">17</td>
 <td align="right">17</td>
-<td align="right">0.00195</td>
-<td align="right">0.010725</td>
+<td align="right">0.00121</td>
+<td align="right">0.006655</td>
 </tr>
 </tbody>
 </table>
@@ -840,10 +840,10 @@ but using the <code>fisher.test</code> function instead of the
 <table class="table">
 <colgroup>
 <col width="6%">
-<col width="14%">
+<col width="15%">
 <col width="17%">
 <col width="20%">
-<col width="19%">
+<col width="18%">
 <col width="21%">
 </colgroup>
 <thead><tr class="header">
@@ -857,82 +857,82 @@ but using the <code>fisher.test</code> function instead of the
 <tbody>
 <tr class="odd">
 <td align="left">gs1</td>
-<td align="left">0.0019545711216273</td>
+<td align="left">0.00120627026727541</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">50</td>
+<td align="left">45</td>
 <td align="left">26</td>
 </tr>
 <tr class="even">
 <td align="left">gs2</td>
-<td align="left">0.0019545711216273</td>
+<td align="left">0.00120627026727541</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">50</td>
+<td align="left">45</td>
 <td align="left">26</td>
 </tr>
 <tr class="odd">
 <td align="left">gs6</td>
-<td align="left">0.0188941875090639</td>
+<td align="left">0.0127969541397913</td>
 <td align="left">16</td>
 <td align="left">1</td>
-<td align="left">51</td>
+<td align="left">46</td>
 <td align="left">25</td>
 </tr>
 <tr class="even">
 <td align="left">gs3</td>
-<td align="left">0.406289063434951</td>
+<td align="left">0.327952331193389</td>
 <td align="left">19</td>
 <td align="left">6</td>
-<td align="left">48</td>
+<td align="left">43</td>
 <td align="left">20</td>
 </tr>
 <tr class="odd">
 <td align="left">gs9</td>
-<td align="left">0.552809778132621</td>
+<td align="left">0.483405811762562</td>
 <td align="left">14</td>
 <td align="left">5</td>
-<td align="left">53</td>
+<td align="left">48</td>
 <td align="left">21</td>
 </tr>
 <tr class="even">
 <td align="left">gs8</td>
-<td align="left">0.616976128863673</td>
+<td align="left">0.551196352053804</td>
 <td align="left">13</td>
 <td align="left">5</td>
-<td align="left">54</td>
+<td align="left">49</td>
 <td align="left">21</td>
 </tr>
 <tr class="odd">
 <td align="left">gs7</td>
-<td align="left">0.756003222114287</td>
+<td align="left">0.698075856018162</td>
 <td align="left">13</td>
 <td align="left">6</td>
-<td align="left">54</td>
+<td align="left">49</td>
 <td align="left">20</td>
 </tr>
 <tr class="even">
 <td align="left">gs5</td>
-<td align="left">0.851697195390683</td>
+<td align="left">0.810587476048376</td>
 <td align="left">11</td>
 <td align="left">6</td>
-<td align="left">56</td>
+<td align="left">51</td>
 <td align="left">20</td>
 </tr>
 <tr class="odd">
 <td align="left">gs10</td>
-<td align="left">0.975031875470329</td>
+<td align="left">0.962158442429783</td>
 <td align="left">12</td>
 <td align="left">9</td>
-<td align="left">55</td>
+<td align="left">50</td>
 <td align="left">17</td>
 </tr>
 <tr class="even">
 <td align="left">gs4</td>
-<td align="left">0.99893020201038</td>
+<td align="left">0.998153286730467</td>
 <td align="left">8</td>
 <td align="left">10</td>
-<td align="left">59</td>
+<td align="left">54</td>
 <td align="left">16</td>
 </tr>
 </tbody>
@@ -980,79 +980,79 @@ signatures:</p>
 <td align="left">1</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">11</td>
+<td align="left">0</td>
 <td align="left">0</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_3</td>
 <td align="left">gs1</td>
-<td align="left">0.0599992079215667</td>
+<td align="left">0.0166725166725167</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">25</td>
+<td align="left">14</td>
 <td align="left">6</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_4</td>
 <td align="left">gs1</td>
-<td align="left">0.00885703192529937</td>
+<td align="left">0.00133372169673928</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">29</td>
+<td align="left">17</td>
 <td align="left">12</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_5</td>
 <td align="left">gs1</td>
-<td align="left">0.00367923171661204</td>
+<td align="left">0.00076732719823464</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">35</td>
+<td align="left">24</td>
 <td align="left">17</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_6</td>
 <td align="left">gs1</td>
-<td align="left">0.00503321024133239</td>
+<td align="left">0.00172728357008366</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">38</td>
+<td align="left">29</td>
 <td align="left">17</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_7</td>
 <td align="left">gs1</td>
-<td align="left">0.00484492230495556</td>
+<td align="left">0.00266766410798389</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">43</td>
+<td align="left">37</td>
 <td align="left">19</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_8</td>
 <td align="left">gs1</td>
-<td align="left">0.00497091954338108</td>
+<td align="left">0.00314946439282499</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">46</td>
+<td align="left">41</td>
 <td align="left">20</td>
 </tr>
 <tr class="odd">
 <td align="left">nsigs_9</td>
 <td align="left">gs1</td>
-<td align="left">0.00346541294300146</td>
+<td align="left">0.00238963647561493</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">47</td>
+<td align="left">43</td>
 <td align="left">22</td>
 </tr>
 <tr class="even">
 <td align="left">nsigs_10</td>
 <td align="left">gs1</td>
-<td align="left">0.0019545711216273</td>
+<td align="left">0.00120627026727541</td>
 <td align="left">17</td>
 <td align="left">0</td>
-<td align="left">50</td>
+<td align="left">45</td>
 <td align="left">26</td>
 </tr>
 </tbody>
@@ -1103,7 +1103,7 @@ signatures:</p>
 <span><span class="co">#&gt;  fastmap                1.1.1       <span style="color: #555555;">2023-02-24</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
 <span><span class="co">#&gt;  fs                     1.6.3       <span style="color: #555555;">2023-07-20</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
 <span><span class="co">#&gt;  generics               0.1.3       <span style="color: #555555;">2022-07-05</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
-<span><span class="co">#&gt;  GenomeInfoDb         * 1.38.5      <span style="color: #555555;">2023-12-28</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
+<span><span class="co">#&gt;  GenomeInfoDb         * 1.38.6      <span style="color: #555555;">2024-02-08</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">Bioconduc~</span></span></span>
 <span><span class="co">#&gt;  GenomeInfoDbData       1.2.11      <span style="color: #555555;">2024-02-09</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
 <span><span class="co">#&gt;  GenomicRanges        * 1.54.1      <span style="color: #555555;">2023-10-29</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
 <span><span class="co">#&gt;  glue                   1.7.0       <span style="color: #555555;">2024-01-09</span> <span style="color: #555555;">[1]</span> <span style="color: #BB00BB; font-weight: bold;">RSPM</span></span></span>
