@@ -1,9 +1,4 @@
-repo:
-  url:
-    home: https://sdgamboa.github.io/enrichmentcode/
-    source: https://github.com/sdgamboa/enrichmentcode/
-    issue: https://github.com/sdgamboa/enrichmentcode/issues/
-    user: https://github.com/sdgamboa/
+url: https://sdgamboa.github.io/enrichmentcode/
 template:
   bootswatch: spacelab
 
